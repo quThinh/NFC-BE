@@ -68,7 +68,7 @@ Insert currency config: `INSERT INTO currency_config (
     'bsctestnet',
     'bsctestnet',
     '97',
-    '{"powerpool": "0x7171b6d550149706DDfE03817Fd3fC6D43dfFa84", "randomNumberGenerator": "0xdD932cD676Ae1f57443bF41f3c1d9e8006Abf202", "lottery": "0x1929eeFB80a21596eacD7c96112652A728Ad9D9b", "randomLottery": "0x049d4d433aD593Da6E5ECD541A5E2110EB4C23aB"}',
+    '{"POS":"0x0DBb0069A7684E2DB1b9962F22Afdc6eB61F43b0", "Vault":"0x0731fE55F95B5b986F4EBd187315fB1F4C823b94"}',
     3000,
     5,
     0,
