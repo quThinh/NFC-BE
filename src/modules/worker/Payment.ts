@@ -22,9 +22,9 @@ export class PaymentWorkerService {
     _web3 = new Web3(this.currency.rpcEndpoint);
 
     _POSAbi = fs.readFileSync('./contracts/POS.sol/POS.json', 'utf8');
-    _POSContract = new this._web3.eth.Contract(JSON.parse(this._POSAbi).abi, "0x8Dc60b934EeDddCE314F9AB1818eB8E436AFB841");
+    _POSContract = new this._web3.eth.Contract(JSON.parse(this._POSAbi).abi, "0x0DBb0069A7684E2DB1b9962F22Afdc6eB61F43b0");
     _VaultAbi = fs.readFileSync('./contracts/VaultContract.sol/VaultContract.json', 'utf8');
-    _VaultContract = new this._web3.eth.Contract(JSON.parse(this._VaultAbi).abi, "0xA43A0bC0E9F0C47eeEe7453916E6D91DEcB58c80");
+    _VaultContract = new this._web3.eth.Contract(JSON.parse(this._VaultAbi).abi, "0x0731fE55F95B5b986F4EBd187315fB1F4C823b94");
     constructor(
         private readonly currency: CurrencyConfig,
         private readonly dataSource: DataSource
@@ -57,7 +57,7 @@ export class PaymentWorkerService {
 
     async crawlDataPOS() {
         return await this.dataSource.transaction(async (manager) => {
-            const contractAddress = "0xA509A02aB4acf8eC59a7D7aF8189FCBbE1378Da8";
+            const contractAddress = "0x0DBb0069A7684E2DB1b9962F22Afdc6eB61F43b0";
 
             let latestBlockInDb = await manager
                 .getRepository(LatestBlock)
@@ -147,7 +147,7 @@ export class PaymentWorkerService {
         }
 
         // update latest block in transaction
-        const latestBlockKey = isTemp ? "POS_" + this.currency.network + "_" + "0xA509A02aB4acf8eC59a7D7aF8189FCBbE1378Da8" + "_temp" : "POS_" + this.currency.network + "_" + "0xA509A02aB4acf8eC59a7D7aF8189FCBbE1378Da8";
+        const latestBlockKey = isTemp ? "POS_" + this.currency.network + "_" + "0x0DBb0069A7684E2DB1b9962F22Afdc6eB61F43b0" + "_temp" : "POS_" + this.currency.network + "_" + "0x0DBb0069A7684E2DB1b9962F22Afdc6eB61F43b0";
         let _latestBlock = await manager.findOne(LatestBlock, {
             where: {
                 currency: latestBlockKey
@@ -173,6 +173,7 @@ export class PaymentWorkerService {
                             let paymentToken = _token;
                             let { _pos, _amount, _deadline, _payer } = eventPay[index].returnValues;
                             _token = eventPay[index].returnValues._token;
+                            console.log(123,_sessionId, _token, _amount, _deadline, _payer);
                             const paymentExist = await manager.findOne(Payment, {
                                 where: {
                                     sessionId: Number(_sessionId),
@@ -203,41 +204,6 @@ export class PaymentWorkerService {
                         }
                     } catch (err) {
                         logger.error(`PaymentWorkerService::handlePaymentEvents error: ${err}`);
-                    }
-                });
-            })
-        )
-    }
-    async handlePaymentVaultEvents(manager: EntityManager, events: any[], status: OnchainStatus, isTemp: boolean = false) {
-        return Promise.allSettled(
-            events.map(async (event) => {
-                return limit(async () => {
-                    try {
-                        if (!isTemp) {
-                            const blockData: any = await this.web3Cache("getBlock_" + event.blockNumber, this._web3.eth.getBlock(event.blockNumber));
-                            let { _sessionId, _pos, _token, _amount, _deadline, _payer } = event.returnValues;
-                            const paymentExist = await manager.findOne(Payment, { where: { sessionId: Number(_sessionId) } });
-                            if (paymentExist) {
-                                paymentExist.sessionId = Number(_sessionId);
-                                paymentExist.POSAddress = _pos;
-                                paymentExist.transferToken = _token;
-                                paymentExist.amount = String(_amount);
-                                paymentExist.deadLine = Number(_deadline);
-                                paymentExist.payer = _payer;
-                                await manager.save(paymentExist);
-                                return;
-                            }
-                            const payment = new Payment();
-                            payment.sessionId = Number(_sessionId);
-                            payment.POSAddress = _pos;
-                            payment.transferToken = _token;
-                            payment.amount = String(_amount);
-                            payment.deadLine = Number(_deadline);
-                            payment.payer = _payer;
-                            await manager.save(payment);
-                        }
-                    } catch (err) {
-                        logger.error(`PaymentWorkerService::handlePlayEvents error: ${err}`);
                     }
                 });
             })
