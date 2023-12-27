@@ -8,9 +8,6 @@ import pLimit from "p-limit";
 import { CurrencyConfig, LatestBlock } from 'src/database/entities';
 import { OnchainStatus, OracleState, RefundStatus } from 'src/shared/enums';
 import { Payment } from 'src/database/entities/Payment.entity';
-import { RoundOnchain } from 'src/database/entities/RoundOnchain.entity';
-import { PlayLog } from 'src/database/entities/PlayLog.entity';
-import { RoundLog } from 'src/database/entities/RoundLog.entity';
 
 const logger = getLogger('PaymentWorkerService');
 const NodeCache = require("node-cache");

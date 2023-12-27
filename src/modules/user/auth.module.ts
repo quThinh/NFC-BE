@@ -5,10 +5,10 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RoundOnchain, User, Payment } from '../../database/entities';
+import { User, Payment } from '../../database/entities';
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, RoundOnchain, Payment]),
+    TypeOrmModule.forFeature([User, Payment]),
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET_KEY,

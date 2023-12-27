@@ -3,11 +3,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { CurrencyRegistryService } from './currency.service';
 import { BlockchainService } from './blockchain.service';
-import { CurrencyConfig, LotteryConfig, PowerPoolConfig } from '../../database/entities';
+import { CurrencyConfig } from '../../database/entities';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([CurrencyConfig, PowerPoolConfig, LotteryConfig]),
+    TypeOrmModule.forFeature([CurrencyConfig]),
     HttpModule,
   ],
   exports: [TypeOrmModule, CurrencyRegistryService, BlockchainService,],
