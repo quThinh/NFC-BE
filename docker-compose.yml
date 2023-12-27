@@ -1,12 +1,13 @@
 version: '3.3'
+
 services:
-  nfc:
+  db:
     image: mysql:5.7
     restart: always
     environment:
       MYSQL_DATABASE: 'nfc'
+      MYSQL_HOST: '127.0.0.1'
       # So you don't have to use root, but you can if you like
-      MYSQL_HOST: 'localhost'
       MYSQL_USER: 'user'
       # You can use whatever password you like
       MYSQL_PASSWORD: 'password'
@@ -14,30 +15,42 @@ services:
       MYSQL_ROOT_PASSWORD: 'password'
     ports:
       # <Port exposed> : < MySQL Port running inside container>
-      - '3307:3306'
+      - '3306:3306'
     expose:
       # Opens port 3306 on the container
-      - '3307'
+      - '3306'
       # Where our data will be persisted
     volumes:
       - ./my-db:/var/lib/mysql
+    networks:
+      - nfc
   web:
     container_name: nfc-backend
     image:  nfc-backends
     restart: on-failure
     ports:
-    - "3001:3001"
+      - "3001:3001"
     environment:
       NODE_ENV: 'dev-api'
+      TYPEORM_HOST: 'db'
     depends_on:
-    - nfc
+      - db
+    networks:
+      - nfc
   worker:
     container_name: nfc-worker
     image:  nfc-backends
     restart: on-failure
     ports:
-    - "3002:3002"
+      - "3002:3002"
     environment:
       NODE_ENV: 'dev-worker'
+      TYPEORM_HOST: 'db'
     depends_on:
-    - nfc
+      - db
+    networks:
+      - nfc
+
+networks:
+  nfc:
+    driver: bridge
